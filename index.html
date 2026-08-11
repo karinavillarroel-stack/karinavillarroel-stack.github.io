@@ -66,6 +66,21 @@
     .card h2 { font-size: 19px; font-weight: 600; }
     .card p { font-size: 14px; color: var(--text-mid); line-height: 1.5; }
     .cta { margin-top: auto; font-size: 14px; font-weight: 500; color: var(--brand-primary); }
+    .notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #FFF8E6;
+      border: 1px solid #F2DFA8;
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 32px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #6B5320;
+    }
+    .notice strong { color: #4A3910; }
+    .notice .mark { font-size: 16px; line-height: 1.4; }
     footer { margin-top: 40px; font-size: 13px; color: var(--text-mid); }
   </style>
 </head>
@@ -74,6 +89,11 @@
     <div class="logo">Índice</div>
     <h1>Publicaciones</h1>
     <p class="sub">Portada de acceso a los sitios publicados. Elige uno para abrirlo.</p>
+
+    <div class="notice">
+      <span class="mark">⚠</span>
+      <span><strong>Uso interno.</strong> Material de trabajo en curso, no comunicación oficial ni definitiva. La dirección es pública: no la reenvíes fuera del equipo ni la publiques en canales abiertos.</span>
+    </div>
 
     <div class="grid">
       <a class="card" href="/andco-wireframes/">
@@ -105,7 +125,7 @@
       </a>
     </div>
 
-    <footer>AIRDS v0.1 · Índice de sitios publicados</footer>
+    <footer>AIRDS v0.1 · Índice de sitios publicados · Uso interno</footer>
   </div>
 </body>
 </html>
