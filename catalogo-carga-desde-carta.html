@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carga desde carta — Catálogo TUU Wireframe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --tuu-500: #1E1EFF;
+      --tuu-400: #5B5BFF;
+      --tuu-50:  #F0F0FF;
+      --lynch-white: #FFFFFF;
+      --lynch-25:  #FAFAFA;
+      --lynch-50:  #F5F5F7;
+      --lynch-100: #EBEBED;
+      --lynch-200: #D1D1D6;
+      --lynch-300: #AEAEB7;
+      --lynch-400: #8E8E9A;
+      --lynch-500: #6C6C78;
+      --lynch-600: #4B4B55;
+      --lynch-700: #3A3A43;
+      --lynch-800: #2A2A30;
+      --lynch-900: #1A1A1F;
+      --green-500: #22C55E; --green-50: #F0FDF4; --green-700: #15803D;
+      --yellow-500: #EAB308; --yellow-50: #FEFCE8; --yellow-700: #A16207;
+      --red-500: #EF4444; --red-50: #FEF2F2; --red-700: #B91C1C;
+      --bg-primary: var(--lynch-white);
+      --bg-soft: var(--lynch-50);
+      --bg-softest: var(--lynch-25);
+      --bg-accent: var(--tuu-50);
+      --text-primary: var(--lynch-900);
+      --text-mid: var(--lynch-500);
+      --text-low: var(--lynch-300);
+      --text-accent: var(--tuu-500);
+      --border-mid: var(--lynch-200);
+      --border-low: var(--lynch-100);
+      --brand-primary: var(--tuu-500);
+      --brand-soft: var(--tuu-50);
+      --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px;
+      --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px;
+      --r-xs:4px; --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:24px; --r-full:9999px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.05);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg-soft); color: var(--text-primary); min-height: 100vh; }
+    h1, h2, h3, h4 { font-family: 'Rajdhani', sans-serif; font-weight: 700; }
+    button, input { font-family: 'DM Sans', sans-serif; }
+
+    .wf-bar {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4);
+      padding: var(--sp-3) var(--sp-6);
+      background: var(--lynch-900); color: var(--lynch-white);
+    }
+    .wf-bar p { font-size: 12px; color: var(--lynch-300); }
+    .wf-bar strong { color: var(--lynch-white); font-weight: 500; }
+    .wf-tabs { display: flex; gap: var(--sp-2); }
+    .wf-tab {
+      border: none; border-radius: var(--r-full); padding: 6px 14px;
+      font-size: 12px; font-weight: 500; cursor: pointer;
+      background: var(--lynch-800); color: var(--lynch-300);
+    }
+    .wf-tab:hover { color: var(--lynch-white); }
+    .wf-tab.on { background: var(--brand-primary); color: var(--lynch-white); }
+
+    .shell { display: flex; min-height: calc(100vh - 48px); }
+    aside {
+      width: 220px; flex: none; background: var(--bg-primary);
+      border-right: 1px solid var(--border-low); padding: var(--sp-6) var(--sp-4);
+    }
+    .brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 22px; color: var(--brand-primary); padding: 0 var(--sp-3); margin-bottom: var(--sp-6); }
+    .nav-item {
+      display: flex; align-items: center; gap: var(--sp-3);
+      padding: var(--sp-3); border-radius: var(--r-md);
+      text-decoration: none; font-size: 14px; color: var(--text-mid);
+    }
+    .nav-item:hover { background: var(--bg-soft); color: var(--text-primary); }
+    .nav-item.on { background: var(--bg-accent); color: var(--text-accent); font-weight: 500; }
+
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--sp-4) var(--sp-8); background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-low);
+    }
+    .commerce { font-size: 14px; font-weight: 500; }
+    .commerce span { color: var(--text-mid); font-weight: 400; }
+    .avatar {
+      width: 36px; height: 36px; border-radius: var(--r-full); background: var(--brand-soft);
+      color: var(--brand-primary); display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600;
+    }
+    .content { padding: var(--sp-8); max-width: 1120px; }
+    .content.wide { max-width: none; padding: var(--sp-6) var(--sp-8) 120px; }
+
+    .screen { display: none; }
+    .screen.on { display: block; }
+
+    .eyebrow { font-size: 12px; font-weight: 500; color: var(--text-mid); letter-spacing: .04em; text-transform: uppercase; margin-bottom: var(--sp-2); }
+    h1 { font-size: 36px; line-height: 1.15; margin-bottom: var(--sp-3); }
+    h1 em { font-style: normal; color: var(--brand-primary); }
+    .lead { font-size: 15px; color: var(--text-mid); line-height: 1.5; max-width: 560px; margin-bottom: var(--sp-8); }
+
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-4); }
+    .choice {
+      text-align: left; background: var(--bg-primary); border: 1.5px solid var(--border-low);
+      border-radius: var(--r-xl); padding: var(--sp-6); cursor: pointer;
+      box-shadow: var(--shadow-sm); min-height: 220px;
+      display: flex; flex-direction: column; gap: var(--sp-3);
+    }
+    .choice:hover { border-color: var(--brand-primary); box-shadow: var(--shadow-md); }
+    .choice.featured { border-color: var(--brand-primary); background: var(--bg-accent); }
+    .choice.featured:hover { filter: brightness(0.99); }
+    .ico {
+      width: 44px; height: 44px; border-radius: var(--r-md); background: var(--bg-soft);
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .choice.featured .ico { background: var(--bg-primary); }
+    .choice h3 { font-size: 20px; }
+    .choice p { font-size: 13px; color: var(--text-mid); line-height: 1.45; flex: 1; }
+    .badge-new {
+      align-self: flex-start; background: var(--brand-primary); color: var(--lynch-white);
+      font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: var(--r-full);
+    }
+
+    .drop-wrap { margin-top: var(--sp-8); display: none; }
+    .drop-wrap.on { display: block; }
+    .drop {
+      border: 1.5px dashed var(--brand-primary); background: var(--bg-primary);
+      border-radius: var(--r-xl); padding: var(--sp-12) var(--sp-8);
+      text-align: center;
+    }
+    .drop h3 { font-size: 22px; margin: var(--sp-4) 0 var(--sp-2); }
+    .drop p { font-size: 14px; color: var(--text-mid); }
+    .drop-ico {
+      width: 72px; height: 72px; margin: 0 auto; border-radius: var(--r-lg);
+      background: var(--brand-soft); color: var(--brand-primary);
+      display: flex; align-items: center; justify-content: center; font-size: 28px;
+    }
+    .formats { margin-top: var(--sp-4); font-size: 12px; color: var(--text-low); }
+    .drop-actions { display: flex; justify-content: center; gap: var(--sp-3); margin-top: var(--sp-6); }
+    .btn {
+      border: none; border-radius: var(--r-full); padding: 10px 20px;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+    }
+    .btn-primary { background: var(--brand-primary); color: var(--lynch-white); }
+    .btn-primary:hover { filter: brightness(1.08); }
+    .btn-primary:disabled { background: var(--lynch-200); color: var(--lynch-white); cursor: not-allowed; filter: none; }
+    .btn-ghost { background: transparent; color: var(--text-mid); border: 1.5px solid var(--border-mid); }
+    .btn-ghost:hover { border-color: var(--text-primary); color: var(--text-primary); }
+    .note { margin-top: var(--sp-4); font-size: 12px; color: var(--text-low); text-align: center; }
+
+    .toast {
+      display: none; margin-top: var(--sp-4); background: var(--brand-soft);
+      border: 1px solid var(--brand-primary); border-radius: var(--r-md);
+      padding: var(--sp-4) var(--sp-5); font-size: 14px; color: var(--brand-primary);
+    }
+    .toast.on { display: block; }
+
+    .rev-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-6); margin-bottom: var(--sp-5); }
+    .back { font-size: 13px; color: var(--text-mid); text-decoration: none; display: inline-block; margin-bottom: var(--sp-3); }
+    .back:hover { color: var(--brand-primary); }
+    .stepper { display: flex; align-items: center; gap: var(--sp-2); font-size: 12px; color: var(--text-low); padding-top: 6px; }
+    .dot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+    .dot.done { background: var(--brand-primary); color: var(--lynch-white); }
+    .dot.now { background: var(--brand-primary); color: var(--lynch-white); }
+    .dot.wait { border: 1.5px solid var(--border-mid); color: var(--text-low); }
+    .step-lab.now { color: var(--text-primary); font-weight: 500; }
+    .step-line { width: 28px; height: 1px; background: var(--border-mid); }
+    .step-line.done { background: var(--brand-primary); }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: var(--sp-3); margin-bottom: var(--sp-5); }
+    .kpi { background: var(--bg-primary); border: 1px solid var(--border-low); border-radius: var(--r-lg); padding: var(--sp-4) var(--sp-5); }
+    .kpi .k { font-size: 12px; color: var(--text-mid); margin-bottom: 4px; }
+    .kpi .v { font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 700; line-height: 1; }
+    .kpi.warn { background: var(--yellow-50); border-color: var(--yellow-500); }
+    .kpi.danger { background: var(--red-50); border-color: var(--red-500); }
+
+    .split { display: grid; grid-template-columns: 340px 1fr; gap: var(--sp-5); align-items: start; }
+    .carta {
+      background: #F6EFE4; border: 1px solid var(--border-low); border-radius: var(--r-lg);
+      padding: var(--sp-6); box-shadow: var(--shadow-md); position: sticky; top: 72px;
+    }
+    .carta-tag { font-size: 11px; font-weight: 500; color: var(--text-mid); margin-bottom: var(--sp-3); text-transform: uppercase; letter-spacing: .06em; }
+    .carta h2 { font-size: 26px; text-align: center; margin-bottom: 2px; color: var(--lynch-800); }
+    .carta .sub { text-align: center; font-size: 12px; color: var(--lynch-500); margin-bottom: var(--sp-5); }
+    .sec { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--lynch-600); margin: var(--sp-4) 0 var(--sp-2); border-bottom: 1px solid #E4D8C6; padding-bottom: 4px; }
+    .plato { display: flex; justify-content: space-between; gap: var(--sp-3); font-size: 13px; color: var(--lynch-800); padding: 3px 0; }
+    .plato.mark { background: rgba(30,30,255,.10); margin: 0 -6px; padding: 3px 6px; border-radius: 4px; }
+    .plato.bad { background: rgba(239,68,68,.12); margin: 0 -6px; padding: 3px 6px; border-radius: 4px; }
+    .precio { font-family: 'Rajdhani', sans-serif; font-weight: 700; white-space: nowrap; }
+
+    .panel { background: var(--bg-primary); border: 1px solid var(--border-low); border-radius: var(--r-lg); overflow: hidden; }
+    .filters { display: flex; gap: var(--sp-1); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-low); }
+    .chip {
+      border: none; background: transparent; color: var(--text-mid);
+      padding: 6px 12px; border-radius: var(--r-full); font-size: 13px; cursor: pointer;
+    }
+    .chip:hover { background: var(--bg-soft); color: var(--text-primary); }
+    .chip.on { background: var(--bg-accent); color: var(--brand-primary); font-weight: 500; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      text-align: left; padding: var(--sp-3) var(--sp-4); background: var(--bg-soft);
+      font-size: 11px; font-weight: 600; color: var(--text-mid); text-transform: uppercase; letter-spacing: .04em;
+    }
+    td { padding: var(--sp-3) var(--sp-4); border-top: 1px solid var(--border-low); vertical-align: middle; }
+    tr:hover td { background: var(--bg-softest); }
+    tr.row-red td { background: var(--red-50); }
+    tr.row-wait td { background: var(--yellow-50); }
+    .name { font-weight: 500; }
+    .hint { font-size: 11px; color: var(--text-mid); margin-top: 2px; }
+    .pill {
+      display: inline-flex; align-items: center; font-size: 11px; font-weight: 500;
+      padding: 2px 8px; border-radius: var(--r-full); white-space: nowrap;
+    }
+    .pill-ok { background: var(--green-50); color: var(--green-700); }
+    .pill-warn { background: var(--yellow-50); color: var(--yellow-700); }
+    .pill-bad { background: var(--red-50); color: var(--red-700); }
+    .pill-info { background: var(--brand-soft); color: var(--brand-primary); }
+    .price-in {
+      width: 96px; border: 1.5px solid var(--border-mid); border-radius: var(--r-sm);
+      padding: 6px 8px; font-size: 13px; font-weight: 500;
+    }
+    .price-in:focus { outline: none; border-color: var(--brand-primary); }
+    .price-in.bad { border-color: var(--red-500); background: var(--red-50); }
+    .mini {
+      border: 1.5px solid var(--border-mid); background: var(--bg-primary); color: var(--text-primary);
+      border-radius: var(--r-full); padding: 4px 10px; font-size: 11px; font-weight: 500; cursor: pointer;
+    }
+    .mini:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+    .mini.on { background: var(--brand-primary); color: var(--lynch-white); border-color: var(--brand-primary); }
+    .acts { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .dock {
+      position: fixed; left: 220px; right: 0; bottom: 0;
+      background: var(--bg-primary); border-top: 1px solid var(--border-low);
+      padding: var(--sp-4) var(--sp-8); display: flex; align-items: center; justify-content: space-between;
+      box-shadow: var(--shadow-md);
+    }
+    .dock p { font-size: 13px; color: var(--text-mid); }
+    .dock strong { color: var(--text-primary); }
+    .dock-btns { display: flex; gap: var(--sp-3); }
+
+    .bulk {
+      display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-4);
+    }
+    .station {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .station .mini.on.cook { background: var(--brand-primary); border-color: var(--brand-primary); }
+    .station .mini.on.none { background: var(--lynch-700); border-color: var(--lynch-700); color: var(--lynch-white); }
+    .row-pending td { background: var(--yellow-50); }
+    .done-box {
+      display: none; margin-top: var(--sp-6); background: var(--green-50);
+      border: 1px solid var(--green-500); border-radius: var(--r-xl);
+      padding: var(--sp-8); text-align: center;
+    }
+    .done-box.on { display: block; }
+    .done-box h2 { font-size: 28px; margin-bottom: var(--sp-2); }
+    .done-box p { font-size: 14px; color: var(--text-mid); margin-bottom: var(--sp-6); }
+
+    .hidden { display: none !important; }
+    @media (max-width: 1100px) {
+      .cards { grid-template-columns: 1fr; }
+      .split { grid-template-columns: 1fr; }
+      .carta { position: static; }
+      aside { display: none; }
+      .dock { left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Wireframe: Carga desde carta · Catálogo | Brand: tuu | Mode: light | AIRDS v0.1 -->
+
+  <div class="wf-bar">
+    <p><strong>Wireframe · I3 Andrea (dueña)</strong> — Café Andrea · no es Onboarding Haulmer</p>
+    <div class="wf-tabs">
+      <button class="wf-tab on" data-screen="s1" type="button">1 · Sube tu carta</button>
+      <button class="wf-tab" data-screen="s2" type="button">2 · Revisar y publicar</button>
+      <button class="wf-tab" data-screen="s3" type="button">3 · Asignar cocina</button>
+    </div>
+  </div>
+
+  <div class="shell">
+    <aside>
+      <div class="brand">TUU</div>
+      <a class="nav-item" href="#">Inicio</a>
+      <a class="nav-item on" href="#">Catálogo</a>
+      <a class="nav-item" href="#">Inventario</a>
+      <a class="nav-item" href="#">Ventas</a>
+      <a class="nav-item" href="#">Configuración</a>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        <p class="commerce">Café Andrea <span>· Gastronomía</span></p>
+        <div class="avatar">AA</div>
+      </div>
+
+      <!-- PANTALLA 1 -->
+      <section id="s1" class="screen on">
+        <div class="content">
+          <p class="eyebrow">Catálogo · primer ingreso</p>
+          <h1>¿Cómo quieres cargar tu <em>catálogo</em>?</h1>
+          <p class="lead">Andrea aún no tiene productos. Elige un camino. «Sube tu carta» solo aparece porque el comercio es gastronómico.</p>
+
+          <div class="cards">
+            <button class="choice" type="button" onclick="alert('Camino actual: crear producto a producto. Fuera de este wireframe.')">
+              <div class="ico">✎</div>
+              <h3>Desde cero</h3>
+              <p>Crea cada producto uno a uno. Sirve si tienes pocos platos o quieres armar variantes a mano.</p>
+            </button>
+            <button class="choice" type="button" onclick="alert('Camino actual: plantilla Excel. Fuera de este wireframe.')">
+              <div class="ico">▦</div>
+              <h3>Desde Excel</h3>
+              <p>Descarga la plantilla, llénala y súbela. Sigue disponible. Andrea no lo necesita si tiene la foto de la carta.</p>
+            </button>
+            <button class="choice featured" type="button" id="btnCarta">
+              <span class="badge-new">Nuevo</span>
+              <div class="ico">☰</div>
+              <h3>Sube tu carta</h3>
+              <p>Arrastra la foto o el PDF que ya tienes. En un minuto revisas lo leído y publicas. Sin planilla.</p>
+            </button>
+          </div>
+
+          <div class="drop-wrap" id="dropWrap">
+            <div class="drop" id="dropZone">
+              <div class="drop-ico">↑</div>
+              <h3>Arrastra la foto o el PDF de tu carta</h3>
+              <p>La misma imagen de Instagram o el archivo que te mandó el diseñador.</p>
+              <p class="formats">JPG, PNG, WEBP o PDF · también puedes pegarla con ⌘V</p>
+              <div class="drop-actions">
+                <button class="btn btn-primary" type="button" id="btnFakeUpload">Elegir archivo</button>
+                <button class="btn btn-ghost" type="button" id="btnSkipDrop">Ahora no</button>
+              </div>
+              <p class="note">No hay que elegir un modelo de IA. Catálogo se encarga de la lectura.</p>
+            </div>
+            <div class="toast" id="toastRead">Leyendo la carta de Café Andrea… esto toma unos 30 segundos.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PANTALLA 2 -->
+      <section id="s2" class="screen">
+        <div class="content wide">
+          <div class="rev-head">
+            <div>
+              <a class="back" href="#" id="backTo1">← Volver a subir otra foto</a>
+              <h1>Revisa lo que leímos de tu <em>carta</em></h1>
+              <p class="lead" style="margin-bottom:0;">Corrige en la fila. Los platos en rojo no se publican hasta que confirmes el precio. El resto sí.</p>
+            </div>
+            <div class="stepper">
+              <div class="dot done">✓</div><span>Carta</span>
+              <div class="step-line done"></div>
+              <div class="dot now">2</div><span class="step-lab now">Revisar</span>
+              <div class="step-line"></div>
+              <div class="dot wait">3</div><span>Cocina</span>
+            </div>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi"><p class="k">Leídos</p><p class="v">80</p></div>
+            <div class="kpi"><p class="k">Listos para publicar</p><p class="v">76</p></div>
+            <div class="kpi warn"><p class="k">Sin precio · decídelo</p><p class="v">1</p></div>
+            <div class="kpi danger"><p class="k">Precio por confirmar</p><p class="v">1</p></div>
+          </div>
+
+          <div class="split">
+            <aside class="carta" aria-label="Carta original">
+              <p class="carta-tag">Original · pág. 1</p>
+              <h2>Café Andrea</h2>
+              <p class="sub">Carta de salón · invierno 2026</p>
+              <p class="sec">Más vendidos</p>
+              <div class="plato"><span>Lomo a lo pobre</span><span class="precio">12.900</span></div>
+              <div class="plato"><span>Completo italiano</span><span class="precio">4.500</span></div>
+              <p class="sec">Almuerzos</p>
+              <div class="plato"><span>Lomo a lo pobre</span><span class="precio">12.900</span></div>
+              <div class="plato"><span>Pizza margarita</span><span class="precio">10.900</span></div>
+              <p class="sec">Bebidas</p>
+              <div class="plato"><span>Café americano</span><span class="precio">2.500</span></div>
+              <div class="plato mark"><span>Té</span><span class="precio">1.800</span></div>
+              <p class="sec">Para la cocina</p>
+              <div class="plato bad"><span>Cebollín</span><span class="precio">—</span></div>
+            </aside>
+
+            <div class="panel">
+              <div class="filters">
+                <button class="chip on" data-filter="all" type="button">Todos (80)</button>
+                <button class="chip" data-filter="attention" type="button">Necesitan decisión (3)</button>
+                <button class="chip" data-filter="ok" type="button">Listos (76)</button>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Estado</th>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Categoría</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-kind="ok">
+                    <td><span class="pill pill-ok">Listo</span></td>
+                    <td><div class="name">Café americano</div></td>
+                    <td>$2.500</td>
+                    <td>Bebidas</td>
+                    <td></td>
+                  </tr>
+                  <tr data-kind="ok">
+                    <td><span class="pill pill-ok">Listo</span></td>
+                    <td>
+                      <div class="name">Té</div>
+                      <div class="hint">Nombre corto: se queda como producto</div>
+                    </td>
+                    <td>$1.800</td>
+                    <td>Bebidas</td>
+                    <td></td>
+                  </tr>
+                  <tr data-kind="attention">
+                    <td><span class="pill pill-info">2 categorías</span></td>
+                    <td>
+                      <div class="name">Lomo a lo pobre</div>
+                      <div class="hint">Estaba en Más vendidos y en Almuerzos. Un solo producto.</div>
+                    </td>
+                    <td>$12.900</td>
+                    <td>Más vendidos, Almuerzos</td>
+                    <td></td>
+                  </tr>
+                  <tr data-kind="ok">
+                    <td><span class="pill pill-ok">Listo</span></td>
+                    <td><div class="name">Completo italiano</div></td>
+                    <td>$4.500</td>
+                    <td>Más vendidos</td>
+                    <td></td>
+                  </tr>
+                  <tr class="row-red" data-kind="attention" id="rowPizza">
+                    <td><span class="pill pill-bad">Precio dudoso</span></td>
+                    <td>
+                      <div class="name">Pizza margarita</div>
+                      <div class="hint">Leímos $1.090. En la carta se ve $10.900. Confirma antes de publicar este plato.</div>
+                    </td>
+                    <td><input class="price-in bad" id="pizzaPrice" value="$1.090" /></td>
+                    <td>Almuerzos</td>
+                    <td><button class="mini" type="button" id="btnConfirmPizza">Confirmar precio</button></td>
+                  </tr>
+                  <tr class="row-wait" data-kind="attention" id="rowCebollin">
+                    <td><span class="pill pill-warn">Sin precio</span></td>
+                    <td>
+                      <div class="name">Cebollín</div>
+                      <div class="hint">No lo mandamos a ingrediente solos. Tú decides.</div>
+                    </td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>
+                      <div class="acts">
+                        <button class="mini" type="button" data-ceb="prod">Es producto</button>
+                        <button class="mini" type="button" data-ceb="ing">Es ingrediente</button>
+                        <button class="mini" type="button" data-ceb="drop">Descartar</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="dock" id="dock2">
+          <p><strong>76 productos</strong> se publican ahora · <strong>2</strong> quedan fuera hasta que Andrea decida</p>
+          <div class="dock-btns">
+            <button class="btn btn-ghost" type="button">Agregar un plato que faltó</button>
+            <button class="btn btn-primary" type="button" id="btnPublish">Publicar 76 productos</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PANTALLA 3 -->
+      <section id="s3" class="screen">
+        <div class="content wide">
+          <div class="rev-head">
+            <div>
+              <a class="back" href="#" id="backTo2">← Volver a la revisión</a>
+              <h1>¿A qué <em>cocina</em> va cada plato?</h1>
+              <p class="lead" style="margin-bottom:0;">Los 76 ya están en el catálogo, pero sin estación la comanda no llega al tablero. Andrea asigna o marca «sin preparación». Sin esto el journey no termina.</p>
+            </div>
+            <div class="stepper">
+              <div class="dot done">✓</div><span>Carta</span>
+              <div class="step-line done"></div>
+              <div class="dot done">✓</div><span>Revisar</span>
+              <div class="step-line done"></div>
+              <div class="dot now">3</div><span class="step-lab now">Cocina</span>
+            </div>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi"><p class="k">Publicados</p><p class="v">76</p></div>
+            <div class="kpi" id="kpiAsig"><p class="k">Con estación</p><p class="v">0</p></div>
+            <div class="kpi warn" id="kpiPend"><p class="k">Sin estación</p><p class="v">8</p></div>
+            <div class="kpi"><p class="k">Pendientes de precio</p><p class="v">2</p></div>
+          </div>
+
+          <div class="bulk">
+            <button class="mini" type="button" id="bulkCocina">Todos los platos → Cocina</button>
+            <button class="mini" type="button" id="bulkBarra">Todas las bebidas → Barra</button>
+            <button class="mini" type="button" id="bulkNone">Bebidas de vitrina → Sin preparación</button>
+          </div>
+
+          <div class="panel">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Categoría</th>
+                  <th>Estación</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="kitchenBody">
+                <tr class="row-pending" data-group="plato">
+                  <td><div class="name">Lomo a lo pobre</div></td>
+                  <td>Más vendidos, Almuerzos</td>
+                  <td>
+                    <div class="station">
+                      <button class="mini" type="button" data-st="Cocina">Cocina</button>
+                      <button class="mini" type="button" data-st="Barra">Barra</button>
+                      <button class="mini" type="button" data-st="Sin preparación">Sin preparación</button>
+                    </div>
+                  </td>
+                  <td><span class="pill pill-warn">Falta</span></td>
+                </tr>
+                <tr class="row-pending" data-group="plato">
+                  <td><div class="name">Completo italiano</div></td>
+                  <td>Más vendidos</td>
+                  <td>
+                    <div class="station">
+                      <button class="mini" type="button" data-st="Cocina">Cocina</button>
+                      <button class="mini" type="button" data-st="Barra">Barra</button>
+                      <button class="mini" type="button" data-st="Sin preparación">Sin preparación</button>
+                    </div>
+                  </td>
+                  <td><span class="pill pill-warn">Falta</span></td>
+                </tr>
+                <tr class="row-pending" data-group="plato">
+                  <td><div class="name">Empanada de pino</div></td>
+                  <td>Para compartir</td>
+                  <td>
+                    <div class="station">
+                      <button class="mini" type="button" data-st="Cocina">Cocina</button>
+                      <button class="mini" type="button" data-st="Barra">Barra</button>
+                      <button class="mini" type="button" data-st="Sin preparación">Sin preparación</button>
+                    </div>
+                  </td>
+                  <td><span class="pill pill-warn">Falta</span></td>
+                </tr>
+                <tr class="row-pending" data-group="plato">
+                  <td><div class="name">Ensalada César</div></td>
+                  <td>Almuerzos</td>
+                  <td>
+                    <div class="station">
+                      <button class="mini" type="button" data-st="Cocina">Cocina</button>
+                      <button class="mini" type="button" data-st="Barra">Barra</button>
+                      <button class="mini" type="button" data-st="Sin preparación">Sin preparación</button>
+                    </div>
+                  </td>
+                  <td><span class="pill pill-warn">Falta</span></td>
+                </tr>
+                <tr class="row-pending" data-group="bebida">
+                  <td>
+                    <div class="name">Café americano</div>
+                    <div class="hint">Suele ir a barra o sin preparación</div>
+                  </td>
+                  <td>Bebidas</td>
+                  <td>
+                    <div class="station">
+                      <button class="mini" type="button" data-st="Cocina">Cocina</button>
+                      <button class="mini" type="button" data-st="Barra">Barra</button>
+                      <button class="mini" type="button" data-st="Sin preparación">Sin preparación</button>
+                    </div>
+                  </td>
+                  <td><span class="pill pill-warn">Falta</span></td>
+                </tr>
+                <tr class="row-pending" data-group="bebida">
+                  <td><div class="name">Té</div></td>
+                  <td>Bebidas</td>
+                  <td>
+                    <div class="station">
+                      <button class="mini" type="button" data-st="Cocina">Cocina</button>
+                      <button class="mini" type="button" data-st="Barra">Barra</button>
+                      <button class="mini" type="button" data-st="Sin preparación">Sin preparación</button>
+                    </div>
+                  </td>
+                  <td><span class="pill pill-warn">Falta</span></td>
+                </tr>
+                <tr class="row-pending" data-group="bebida">
+                  <td><div class="name">Jugo natural</div></td>
+                  <td>Bebidas</td>
+                  <td>
+                    <div class="station">
+                      <button class="mini" type="button" data-st="Cocina">Cocina</button>
+                      <button class="mini" type="button" data-st="Barra">Barra</button>
+                      <button class="mini" type="button" data-st="Sin preparación">Sin preparación</button>
+                    </div>
+                  </td>
+                  <td><span class="pill pill-warn">Falta</span></td>
+                </tr>
+                <tr class="row-pending" data-group="vitrina">
+                  <td>
+                    <div class="name">Agua mineral</div>
+                    <div class="hint">Vitrina: no pasa por cocina</div>
+                  </td>
+                  <td>Bebidas</td>
+                  <td>
+                    <div class="station">
+                      <button class="mini" type="button" data-st="Cocina">Cocina</button>
+                      <button class="mini" type="button" data-st="Barra">Barra</button>
+                      <button class="mini" type="button" data-st="Sin preparación">Sin preparación</button>
+                    </div>
+                  </td>
+                  <td><span class="pill pill-warn">Falta</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="done-box" id="doneBox">
+            <h2>El catálogo ya está operando</h2>
+            <p>Andrea puede cobrar. Las comandas de cocina llegan al tablero. Pizza y Cebollín siguen fuera, a la espera de su decisión.</p>
+            <button class="btn btn-primary" type="button" onclick="alert('En el producto real, esto abre Mostrador o Mesas con el catálogo nuevo.')">Ir a vender</button>
+          </div>
+        </div>
+
+        <div class="dock hidden" id="dock3">
+          <p id="dock3copy"><strong>0 de 8</strong> con estación · el resto no llega a cocina si Andrea cierra ahora</p>
+          <div class="dock-btns">
+            <button class="btn btn-ghost" type="button" id="btnLater">Configurar después</button>
+            <button class="btn btn-primary" type="button" id="btnFinish" disabled>Terminar</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.wf-tab');
+    const screens = { s1: document.getElementById('s1'), s2: document.getElementById('s2'), s3: document.getElementById('s3') };
+    function show(id) {
+      Object.values(screens).forEach(s => s.classList.remove('on'));
+      screens[id].classList.add('on');
+      tabs.forEach(t => t.classList.toggle('on', t.dataset.screen === id));
+      document.getElementById('dock2').classList.toggle('hidden', id !== 's2');
+      document.getElementById('dock3').classList.toggle('hidden', id !== 's3');
+    }
+    tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.screen)));
+
+    document.getElementById('btnCarta').addEventListener('click', () => {
+      document.getElementById('dropWrap').classList.add('on');
+      document.getElementById('dropWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    document.getElementById('btnSkipDrop').addEventListener('click', () => {
+      document.getElementById('dropWrap').classList.remove('on');
+    });
+    document.getElementById('btnFakeUpload').addEventListener('click', () => {
+      const toast = document.getElementById('toastRead');
+      toast.classList.add('on');
+      setTimeout(() => show('s2'), 900);
+    });
+    document.getElementById('dropZone').addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      document.getElementById('btnFakeUpload').click();
+    });
+    document.getElementById('backTo1').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('toastRead').classList.remove('on');
+      show('s1');
+    });
+
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+        chip.classList.add('on');
+        const f = chip.dataset.filter;
+        document.querySelectorAll('#s2 tbody tr').forEach(row => {
+          row.classList.toggle('hidden', f !== 'all' && row.dataset.kind !== f);
+        });
+      });
+    });
+
+    document.getElementById('btnConfirmPizza').addEventListener('click', function () {
+      const row = document.getElementById('rowPizza');
+      const input = document.getElementById('pizzaPrice');
+      input.value = '$10.900';
+      input.classList.remove('bad');
+      row.classList.remove('row-red');
+      row.dataset.kind = 'ok';
+      row.querySelector('.pill').className = 'pill pill-ok';
+      row.querySelector('.pill').textContent = 'Listo';
+      row.querySelector('.hint').textContent = 'Precio confirmado por Andrea';
+      this.textContent = 'Confirmado';
+      this.disabled = true;
+    });
+
+    document.querySelectorAll('[data-ceb]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-ceb]').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        const row = document.getElementById('rowCebollin');
+        const map = {
+          prod: 'Andrea lo dejó como producto. Falta que ponga precio para publicarlo.',
+          ing: 'Va a la lista de ingredientes. No se vende solo.',
+          drop: 'No entra al catálogo.'
+        };
+        row.querySelector('.hint').textContent = map[btn.dataset.ceb];
+        if (btn.dataset.ceb !== 'prod') {
+          row.classList.remove('row-wait');
+          row.dataset.kind = 'ok';
+          row.querySelector('.pill').className = 'pill pill-ok';
+          row.querySelector('.pill').textContent = btn.dataset.ceb === 'ing' ? 'Ingrediente' : 'Descartado';
+        }
+      });
+    });
+
+    document.getElementById('btnPublish').addEventListener('click', () => show('s3'));
+    document.getElementById('backTo2').addEventListener('click', (e) => {
+      e.preventDefault();
+      show('s2');
+    });
+
+    function kitchenState() {
+      const rows = [...document.querySelectorAll('#kitchenBody tr')];
+      const done = rows.filter(r => r.dataset.assigned).length;
+      const total = rows.length;
+      document.querySelector('#kpiAsig .v').textContent = done;
+      document.querySelector('#kpiPend .v').textContent = total - done;
+      document.getElementById('dock3copy').innerHTML =
+        done === total
+          ? `<strong>${done} de ${total}</strong> con estación · Andrea ya puede terminar`
+          : `<strong>${done} de ${total}</strong> con estación · el resto no llega a cocina si cierra ahora`;
+      document.getElementById('btnFinish').disabled = done !== total;
+    }
+
+    function assignRow(row, station) {
+      row.dataset.assigned = station;
+      row.classList.remove('row-pending');
+      row.querySelectorAll('.station .mini').forEach(b => {
+        b.classList.toggle('on', b.dataset.st === station);
+        b.classList.toggle('cook', station !== 'Sin preparación' && b.dataset.st === station);
+        b.classList.toggle('none', station === 'Sin preparación' && b.dataset.st === station);
+      });
+      const pill = row.querySelector('.pill');
+      pill.className = station === 'Sin preparación' ? 'pill pill-info' : 'pill pill-ok';
+      pill.textContent = station;
+      kitchenState();
+    }
+
+    document.querySelectorAll('#kitchenBody .station .mini').forEach(btn => {
+      btn.addEventListener('click', () => assignRow(btn.closest('tr'), btn.dataset.st));
+    });
+    document.getElementById('bulkCocina').addEventListener('click', () => {
+      document.querySelectorAll('#kitchenBody tr[data-group="plato"]').forEach(r => assignRow(r, 'Cocina'));
+    });
+    document.getElementById('bulkBarra').addEventListener('click', () => {
+      document.querySelectorAll('#kitchenBody tr[data-group="bebida"]').forEach(r => assignRow(r, 'Barra'));
+    });
+    document.getElementById('bulkNone').addEventListener('click', () => {
+      document.querySelectorAll('#kitchenBody tr[data-group="vitrina"]').forEach(r => assignRow(r, 'Sin preparación'));
+    });
+    document.getElementById('btnLater').addEventListener('click', () => {
+      alert('En I3 esto no cierra el journey: un producto sin estación se cobra y la comanda no aparece en el tablero. Por eso Terminar está bloqueado.');
+    });
+    document.getElementById('btnFinish').addEventListener('click', () => {
+      document.getElementById('doneBox').classList.add('on');
+      document.getElementById('doneBox').scrollIntoView({ behavior: 'smooth' });
+    });
+    kitchenState();
+  </script>
+</body>
+</html>
