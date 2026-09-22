@@ -1,0 +1,1096 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>OST · Reservas & Eventos — Árbol visual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --ink: #1a2332;
+      --muted: #5c6b7a;
+      --line: #c5ced6;
+      --line-strong: #8a9aab;
+      --outcome: #d6e8fb;
+      --outcome-border: #6a9fd4;
+      --opportunity: #ffe566;
+      --opportunity-border: #d4b000;
+      --opportunity-soft: #fff6c2;
+      --solution: #b8ecc8;
+      --solution-border: #4caf6e;
+      --experiment: #ddd4f7;
+      --experiment-border: #8b7bc8;
+      --focus: #1f4e79;
+      --warn: #f3d5a8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Source Sans 3", system-ui, sans-serif;
+      line-height: 1.35;
+    }
+
+    .page {
+      padding: 20px 24px 48px;
+      max-width: 100%;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 26px;
+      letter-spacing: -0.03em;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--focus);
+      border-radius: 8px;
+      background: var(--focus);
+      color: #fff;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: var(--surface);
+      color: var(--focus);
+    }
+
+    button:hover { filter: brightness(1.05); }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
+
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid rgba(0,0,0,.12);
+    }
+
+    .swatch.outcome { background: var(--outcome); }
+    .swatch.opportunity { background: var(--opportunity); }
+    .swatch.solution { background: var(--solution); }
+    .swatch.experiment { background: var(--experiment); }
+
+    .callout {
+      background: #e8f1fa;
+      border: 1px solid var(--outcome-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .callout strong { color: var(--focus); }
+
+    /* —— Tree stage —— */
+    .stage-wrap {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: auto;
+      min-height: 640px;
+    }
+
+    .stage {
+      position: relative;
+      min-width: 1920px;
+      padding: 28px 32px 40px;
+    }
+
+    #connectors {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    #connectors path {
+      fill: none;
+      stroke: var(--line-strong);
+      stroke-width: 1.5;
+    }
+
+    #connectors path.dim {
+      stroke: var(--line);
+      stroke-width: 1;
+      opacity: 0.55;
+    }
+
+    .rank {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 56px;
+    }
+
+    .rank.opp-rank {
+      justify-content: flex-start;
+      padding: 0 8px;
+      gap: 10px;
+    }
+
+    .rank.child-rank,
+    .rank.sol-rank,
+    .rank.exp-rank {
+      min-height: 20px;
+    }
+
+    .rank-label {
+      position: absolute;
+      left: 8px;
+      top: -18px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .node {
+      position: relative;
+      border-radius: 10px;
+      border: 1.5px solid var(--line);
+      padding: 10px 12px;
+      background: var(--surface);
+      box-shadow: none;
+      cursor: default;
+      transition: border-color .15s, outline .15s, transform .12s;
+    }
+
+    .node.interactive { cursor: pointer; }
+    .node.interactive:hover { transform: translateY(-1px); }
+
+    .node.outcome {
+      width: min(520px, 90%);
+      background: var(--outcome);
+      border-color: var(--outcome-border);
+      text-align: center;
+      cursor: default;
+    }
+
+    .node.opportunity {
+      width: 132px;
+      min-height: 118px;
+      background: var(--opportunity);
+      border-color: var(--opportunity-border);
+      flex-shrink: 0;
+    }
+
+    .node.opportunity.soft {
+      background: var(--opportunity-soft);
+    }
+
+    .node.opportunity.active {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+      border-color: var(--focus);
+    }
+
+    .node.opportunity.priority::after {
+      content: "Priorizar";
+      position: absolute;
+      top: -9px;
+      right: 6px;
+      background: var(--focus);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .node.opportunity.provisional {
+      border-style: dashed;
+    }
+
+    .node.opportunity.provisional.priority::after {
+      content: "Ex-hueco";
+      background: #8a5a00;
+    }
+
+    .node.child {
+      width: 200px;
+      min-height: 96px;
+      background: var(--opportunity);
+      border-color: var(--opportunity-border);
+    }
+
+    .node.solution {
+      width: 210px;
+      min-height: 88px;
+      background: var(--solution);
+      border-color: var(--solution-border);
+    }
+
+    .node.experiment {
+      width: min(560px, 90%);
+      background: var(--experiment);
+      border-color: var(--experiment-border);
+      text-align: left;
+    }
+
+    .node .kind {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .node .id {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--focus);
+      margin-bottom: 2px;
+    }
+
+    .node .title {
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .node.outcome .title {
+      font-size: 15px;
+    }
+
+    .node .meta {
+      margin-top: 6px;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .empty-hint {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 12px 16px;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      background: #fafbfc;
+    }
+
+    .detail-bar {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .detail-bar { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+
+    .panel p, .panel li {
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .panel ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .panel li + li { margin-top: 4px; }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .pill {
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      padding: 3px 8px;
+      background: #f7f8fa;
+      color: var(--muted);
+    }
+
+    .pill.hot {
+      background: var(--outcome);
+      border-color: var(--outcome-border);
+      color: var(--focus);
+    }
+
+    footer {
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @media print {
+      body { background: #fff; }
+      .toolbar, .callout { display: none; }
+      .stage-wrap { overflow: visible; border: none; }
+      .stage { min-width: 0; }
+      .node.opportunity { width: 110px; min-height: 100px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <h1>OST · Reservas &amp; Eventos</h1>
+        <p class="subtitle">
+          Opportunity Solution Tree v0 — Product Safari + 2 entrevistas + estrategia.
+          Click en una oportunidad para expandir soluciones y experimento.
+        </p>
+      </div>
+      <div class="toolbar">
+        <button type="button" class="secondary" id="btn-discovery">Ver descubrimiento (O0)</button>
+        <button type="button" class="secondary" id="btn-reset">Ver setup (O1)</button>
+        <button type="button" id="btn-print">Imprimir / PDF</button>
+      </div>
+    </header>
+
+    <div class="legend">
+      <span><i class="swatch outcome"></i> Outcome</span>
+      <span><i class="swatch opportunity"></i> Oportunidad</span>
+      <span><i class="swatch solution"></i> Solución</span>
+      <span><i class="swatch experiment"></i> Experimento</span>
+    </div>
+
+    <div class="callout">
+      <strong>Adopción tiene dos puertas:</strong>
+      <strong>O0</strong> = no conozco / no encuentro el módulo (antes era hueco del árbol; H5/H6 + Eventos).
+      <strong>O1</strong> = ya lo encontré, pero no sé si lo dejé bien configurado.
+      Comparar hermanas O0 vs O1 según el segmento (nunca adoptó vs adoptó y se trabó).
+      Bugs/Quick Wins → carril rápido, fuera del árbol.
+    </div>
+
+    <div class="stage-wrap" id="stage-wrap">
+      <div class="stage" id="stage">
+        <svg id="connectors" aria-hidden="true"></svg>
+
+        <div class="rank" id="rank-outcome">
+          <span class="rank-label" style="position:static;margin-right:auto;align-self:center;">Outcome</span>
+        </div>
+
+        <!-- rebuilt by JS for clean centering of outcome -->
+        <div class="rank" id="rank-outcome-node"></div>
+        <div class="rank opp-rank" id="rank-opps">
+          <span class="rank-label">Oportunidades</span>
+        </div>
+        <div class="rank child-rank" id="rank-children">
+          <span class="rank-label">Sub-oportunidades</span>
+        </div>
+        <div class="rank sol-rank" id="rank-solutions">
+          <span class="rank-label">Soluciones</span>
+        </div>
+        <div class="rank exp-rank" id="rank-experiment">
+          <span class="rank-label">Experimento</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-bar">
+      <div class="panel" id="panel-why">
+        <h2>Por qué importa</h2>
+        <p id="why-text">Selecciona una oportunidad.</p>
+      </div>
+      <div class="panel" id="panel-meta">
+        <h2>Contexto</h2>
+        <div class="pill-row" id="meta-pills"></div>
+        <p id="meta-text"></p>
+      </div>
+    </div>
+
+    <footer>
+      Fuentes: Product Safari TK-33123 · Check-in CPO 04-sep-2026 · Metodología de Priorización ·
+      Estrategia Reservas · Inbox (~61 hallazgos). Huecos que siguen fuera del árbol: churn real (H1–H4),
+      brechas de benchmarking (IA, marketplace, app móvil, fidelización). Bugs/Quick Wins no compiten acá.
+    </footer>
+  </div>
+
+  <script>
+    const OUTCOME = {
+      id: "OUT",
+      title: "Aumentar el % de comercios que activan y usan Reservas de forma recurrente (adopción + actividad) en los 7 macro-rubros prioritarios",
+      meta: "Baseline a alinear · Q4: activos + pagos vía TUU en Reservas",
+    };
+
+    const opportunities = [
+      {
+        id: "O0",
+        title: "No conozco el módulo de Reservas & Eventos (no sé que existe o no lo encuentro)",
+        ideas: 0,
+        pillar: "Activación",
+        confidence: "Media",
+        hypotheses: "H5, H6, H8",
+        priority: true,
+        provisional: true,
+        why: "Antes era hueco del árbol. Explica gran parte de la no-adopción: ~30% de no-adoptantes nunca entró genuinamente al EdT (H5) y ~66% sí entró pero igual no adoptó (H6 es el bloque más grande sin explicar). Sin esta rama, el OST solo mejoraba a quien ya encontró el módulo.",
+        children: [
+          {
+            id: "O0.1",
+            title: "Nunca entro al Espacio de Trabajo; ONB o un partner lo activó por mí",
+            hypotheses: "H5",
+            why: "Evidencia cuantitativa: ~30% de no-adoptantes no tuvo entrada genuina al EdT. El módulo existe en la cuenta, pero el operador del local nunca lo vio.",
+            solutions: [
+              { title: "Handoff medible post-activación ONB/partner (quién debe entrar y cuándo)", kind: "Operacional" },
+              { title: "WhatsApp / correo al dueño con link directo al módulo recién habilitado", kind: "Rendimiento" },
+              { title: "Checklist de primera visita al EdT en el onboarding TUU", kind: "Rendimiento" },
+            ],
+            experiment: "Con ONB: en 20 altas nuevas, medir % de comercios que abren Reservas/Eventos en ≤7 días con vs sin handoff explícito al dueño.",
+          },
+          {
+            id: "O0.2",
+            title: "Entro al Espacio de Trabajo, pero no descubro o no entiendo Reservas",
+            hypotheses: "H6",
+            why: "Bloque más grande sin explicar (~66% de no-adoptantes sí entró al EdT). El módulo compite con otras apps del home y no se entiende qué trabajo resuelve.",
+            solutions: [
+              { title: "Descubrimiento contextual en el EdT (prompt por rubro: peluquería, salud, vet)", kind: "Rendimiento" },
+              { title: "Tour del home que destaque Reservas cuando el rubro es de agenda", kind: "Rendimiento" },
+              { title: "Empty state del módulo con valor en 1 frase + CTA a plantilla", kind: "Rendimiento" },
+            ],
+            experiment: "Reunión/entrevistas con ONB + 5 no-adoptantes que sí usan el EdT. Señal: pueden nombrar Reservas y describir para qué sirve sin que se lo expliquen.",
+          },
+          {
+            id: "O0.3",
+            title: "No sé que existe Eventos, o lo confundo con Reservas",
+            hypotheses: "PI-6 / Eventos",
+            why: "Hueco explícito: Eventos casi no aparecía en el OST. Muchos comercios pueden necesitar eventos/acreditación y nunca enterarse de que hay un módulo aparte (o creer que Reservas lo cubre).",
+            solutions: [
+              { title: "Posicionamiento claro Reservas vs Eventos en el EdT (cuándo usar cuál)", kind: "Rendimiento" },
+              { title: "Entrada a Eventos desde flujos de rubros/eventos puntuales", kind: "Rendimiento" },
+              { title: "Mensaje de ONB/CS que distinga ambos productos en el alta", kind: "Operacional" },
+            ],
+            experiment: "En entrevistas de no-adopción y activos: preguntar si conocen Eventos y qué trabajo creen que resuelve. Señal: % que lo confunde con Reservas o no lo nombra.",
+          },
+          {
+            id: "O0.4",
+            title: "Sé que existe, pero no lo busco: ya tengo WhatsApp / agenda / otro software",
+            hypotheses: "H8",
+            why: "No es desconocimiento puro: es 'no lo necesito lo suficiente'. Hay que separarlo de H5/H6 en entrevistas; si no, se diseña discovery para quien en realidad eligió no cambiar.",
+            solutions: [
+              { title: "Comparar vs alternativa real (WhatsApp/cuaderno) en el empty state", kind: "Rendimiento" },
+              { title: "Activación solo del job no cubierto (ej. link público o cobro de abono)", kind: "Rendimiento" },
+            ],
+            experiment: "Switch interviews con no-adoptantes que sí conocen el módulo. Señal: qué los hace quedarse en la alternativa actual.",
+          },
+        ],
+        solutions: [],
+        experiment: null,
+      },
+      {
+        id: "O1",
+        title: "No sé si dejé Reservas bien configurado para empezar a recibir reservas",
+        ideas: 14,
+        pillar: "Activación",
+        confidence: "Alta",
+        hypotheses: "H7",
+        priority: true,
+        why: "Mayor volumen de evidencia cualitativa (Safari + SAC #1 = configuración). Es el cuello de quien YA encontró el módulo. No sustituye a O0.",
+        children: [
+          {
+            id: "O1.1",
+            title: "No sé por dónde empezar a configurar la primera vez",
+            hypotheses: "H7",
+            why: "Sin guía post-plantilla el comercio se queda a medias. Distinto de O0.2: aquí ya abrió Reservas.",
+            solutions: [
+              { title: "Tour / checklist de setup específico de Reservas", kind: "Rendimiento" },
+              { title: "Wizard post-plantilla: servicio → disponibilidad → link público", kind: "Rendimiento" },
+            ],
+            experiment: "Shadowing / entrevista de setup con 5 que adoptaron. Medir tiempo a 1ª reserva pública y abandono por paso.",
+          },
+          {
+            id: "O1.2",
+            title: "Me pierdo al configurar algo enlazado y no sé volver",
+            hypotheses: "H7",
+            why: "Patrón transversal del Safari: flujos a medias. Parte puede ir por carril Quick Win.",
+            solutions: [
+              { title: "Patrón transversal «volver al flujo» + breadcrumb", kind: "Básico" },
+            ],
+            experiment: null,
+          },
+          {
+            id: "O1.3",
+            title: "No confirma que quedó bien ni avisa si falló",
+            hypotheses: "H7",
+            why: "Errores silenciosos (eliminar agenda/servicio, disponibilidad sin servicio).",
+            solutions: [
+              { title: "Confirmación de guardado + errores no silenciosos", kind: "Básico" },
+              { title: "Preview antes de publicar (sitio, colores, ficha)", kind: "Rendimiento" },
+            ],
+            experiment: null,
+          },
+        ],
+        solutions: [],
+        experiment: null,
+      },
+      {
+        id: "O2",
+        title: "No puedo confiar en que mi calendario del día refleje bien mis reservas",
+        ideas: 7,
+        pillar: "Retención",
+        confidence: "Media",
+        hypotheses: "H3",
+        why: "Safari + Newen + Ecoglam. Si el calendario no es usable, no hay hábito diario.",
+        children: [],
+        solutions: [
+          { title: "Crear reserva clickeando el slot (no solo el +)", kind: "Rendimiento" },
+          { title: "Vista semanal con zoom / más horas", kind: "Rendimiento" },
+          { title: "Alerta de doble agenda (profesional o paciente)", kind: "Básico" },
+          { title: "Registrar walk-ins en 1 clic", kind: "Rendimiento" },
+        ],
+        experiment: "Prototipo clickeable con 5 operadores en hora peak. Señal: % que crea una reserva sin ayuda en <30 s.",
+      },
+      {
+        id: "O3",
+        title: "No me resulta intuitivo configurar ni encontrar la ficha clínica",
+        ideas: 7,
+        pillar: "Diferenciación",
+        confidence: "Media",
+        why: "Concentra fricción en Complementos. Relevante para Salud, después de setup/calendario.",
+        children: [],
+        solutions: [
+          { title: "Acceso directo a fichas desde perfil/cliente", kind: "Rendimiento" },
+          { title: "Historial de versiones con diff", kind: "Básico" },
+        ],
+        experiment: null,
+      },
+      {
+        id: "O4",
+        title: "No tengo claridad sobre qué y cuándo le llega una notificación a mi cliente",
+        ideas: 6,
+        pillar: "Retención",
+        confidence: "Baja",
+        why: "Config de WhatsApp/correo y encuestas opaca. Poca voz de merchant aún.",
+        children: [],
+        solutions: [
+          { title: "Matriz canal × evento editable", kind: "Rendimiento" },
+          { title: "Preview del mensaje + delay configurable", kind: "Rendimiento" },
+        ],
+        experiment: null,
+      },
+      {
+        id: "O5",
+        title: "No sé si el pago queda protegido cuando el cliente cambia o anula",
+        ideas: 5,
+        pillar: "Retención",
+        confidence: "Media",
+        hypotheses: "H1, H2",
+        why: "Newen: frena publicar autoagendamiento. Alta leverage sobre caudal.",
+        children: [],
+        solutions: [
+          { title: "Anulada pagada visible + reasignar/devolver", kind: "Básico" },
+          { title: "Política de abono / no-show configurable", kind: "Rendimiento" },
+        ],
+        experiment: "Supuesto: si confían en el pago al anular, publican el link. Concierge con 5–8 activos que hoy no publican.",
+      },
+      {
+        id: "O6",
+        title: "Quiero talleres/sesiones grupales como grupo, no citas sueltas",
+        ideas: 3,
+        pillar: "Diferenciación",
+        confidence: "Baja",
+        hypotheses: "H3",
+        why: "Newen. Encaje Salud/educación; no es transversal aún.",
+        children: [],
+        solutions: [
+          { title: "Agrupación visual de cupos de taller", kind: "Rendimiento" },
+          { title: "Multi-profesional dictante en un taller", kind: "Rendimiento" },
+        ],
+        experiment: null,
+      },
+      {
+        id: "O7",
+        title: "Administrar sucursales, roles y marca sin depender de soporte",
+        ideas: 3,
+        pillar: "Secundaria",
+        confidence: "Baja",
+        why: "Safari + Ecoglam. Dolor real, alcance menor vs O1/O2/O5.",
+        children: [],
+        solutions: [
+          { title: "Autogestión de sucursales y URLs", kind: "Rendimiento" },
+          { title: "Admin de negocio completo sin Trazolabs", kind: "Rendimiento" },
+        ],
+        experiment: null,
+      },
+      {
+        id: "O8",
+        title: "El sistema me muestra info que no refleja lo que pasó",
+        ideas: 3,
+        pillar: "Retención",
+        confidence: "Baja",
+        why: "Bugs de consistencia. Preferir carril Bug, no ronda de OST.",
+        children: [],
+        solutions: [
+          { title: "Backlog de bugs de consistencia (carril rápido)", kind: "Básico" },
+        ],
+        experiment: null,
+      },
+      {
+        id: "O9",
+        title: "Cobrar y dar descuentos con más flexibilidad",
+        ideas: 3,
+        pillar: "Secundaria",
+        confidence: "Baja",
+        why: "Descuentos solo %. Baja evidencia de churn.",
+        children: [],
+        solutions: [
+          { title: "Descuento por monto fijo + texto personalizable", kind: "Deleite" },
+        ],
+        experiment: null,
+      },
+      {
+        id: "O10",
+        title: "Seguimiento de packs y certificados de atención",
+        ideas: 2,
+        pillar: "Diferenciación",
+        confidence: "Baja",
+        hypotheses: "H3",
+        why: "Newen / Salud. Diferenciación de rubro, no primer movimiento.",
+        children: [],
+        solutions: [
+          { title: "Vista de pack: agendadas vs pendientes", kind: "Rendimiento" },
+          { title: "Certificado de prestación exportable", kind: "Rendimiento" },
+        ],
+        experiment: null,
+      },
+      {
+        id: "O11",
+        title: "Exportar y segmentar todos los reportes igual",
+        ideas: 2,
+        pillar: "Secundaria",
+        confidence: "Baja",
+        why: "Inconsistencia de descarga entre reportes.",
+        children: [],
+        solutions: [
+          { title: "Descarga uniforme + segmentación por edad", kind: "Rendimiento" },
+        ],
+        experiment: null,
+      },
+      {
+        id: "O12",
+        title: "Registrar más info de clientes que los campos por defecto",
+        ideas: 2,
+        pillar: "Secundaria",
+        confidence: "Baja",
+        why: "Import masivo sin campos personalizados.",
+        children: [],
+        solutions: [
+          { title: "Campos personalizados en import/export", kind: "Rendimiento" },
+        ],
+        experiment: null,
+      },
+    ];
+
+    let selectedOppId = "O0";
+    let selectedChildId = "O0.2";
+
+    function el(tag, attrs = {}, children = []) {
+      const node = document.createElement(tag);
+      Object.entries(attrs).forEach(([k, v]) => {
+        if (k === "className") node.className = v;
+        else if (k === "dataset") Object.assign(node.dataset, v);
+        else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2).toLowerCase(), v);
+        else if (v !== null && v !== undefined) node.setAttribute(k, v);
+      });
+      (Array.isArray(children) ? children : [children]).forEach((c) => {
+        if (c == null) return;
+        node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+      });
+      return node;
+    }
+
+    function findOpp(id) {
+      return opportunities.find((o) => o.id === id);
+    }
+
+    function activeLeaf() {
+      const opp = findOpp(selectedOppId);
+      if (!opp) return null;
+      if (opp.children.length) {
+        return opp.children.find((c) => c.id === selectedChildId) || opp.children[0];
+      }
+      return opp;
+    }
+
+    function render() {
+      const stage = document.getElementById("stage");
+      const rankOutcome = document.getElementById("rank-outcome-node");
+      const rankOpps = document.getElementById("rank-opps");
+      const rankChildren = document.getElementById("rank-children");
+      const rankSol = document.getElementById("rank-solutions");
+      const rankExp = document.getElementById("rank-experiment");
+
+      // hide unused first rank shell
+      document.getElementById("rank-outcome").style.display = "none";
+
+      rankOutcome.innerHTML = "";
+      rankOpps.innerHTML = '<span class="rank-label">Oportunidades</span>';
+      rankChildren.innerHTML = '<span class="rank-label">Sub-oportunidades</span>';
+      rankSol.innerHTML = '<span class="rank-label">Soluciones</span>';
+      rankExp.innerHTML = '<span class="rank-label">Experimento</span>';
+
+      // Outcome
+      const outcomeNode = el("div", {
+        className: "node outcome",
+        id: "node-OUT",
+      }, [
+        el("div", { className: "kind" }, "Outcome"),
+        el("div", { className: "title" }, OUTCOME.title),
+        el("div", { className: "meta" }, OUTCOME.meta),
+      ]);
+      rankOutcome.appendChild(outcomeNode);
+
+      // Opportunities
+      opportunities.forEach((opp) => {
+        const isActive = opp.id === selectedOppId;
+        const node = el("div", {
+          className:
+            "node opportunity interactive" +
+            (isActive ? " active" : " soft") +
+            (opp.priority ? " priority" : "") +
+            (opp.provisional ? " provisional" : ""),
+          id: "node-" + opp.id,
+          role: "button",
+          tabindex: "0",
+          onclick: () => {
+            selectedOppId = opp.id;
+            selectedChildId = opp.children[0] ? opp.children[0].id : null;
+            render();
+          },
+        }, [
+          el("div", { className: "id" }, opp.id),
+          el("div", { className: "title" }, opp.title),
+          el("div", { className: "meta" }, opp.ideas + " ideas · " + opp.pillar),
+        ]);
+        rankOpps.appendChild(node);
+      });
+
+      const opp = findOpp(selectedOppId);
+
+      // Children
+      if (opp && opp.children.length) {
+        opp.children.forEach((child) => {
+          const isActive = child.id === selectedChildId;
+          const node = el("div", {
+            className: "node opportunity child interactive" + (isActive ? " active" : ""),
+            id: "node-" + child.id,
+            role: "button",
+            tabindex: "0",
+            onclick: () => {
+              selectedChildId = child.id;
+              render();
+            },
+          }, [
+            el("div", { className: "id" }, child.id),
+            el("div", { className: "title" }, child.title),
+            child.hypotheses
+              ? el("div", { className: "meta" }, "Hipótesis: " + child.hypotheses)
+              : null,
+          ]);
+          rankChildren.appendChild(node);
+        });
+      } else {
+        rankChildren.appendChild(
+          el("div", { className: "empty-hint" }, "Esta oportunidad es hoja: no tiene sub-oportunidades.")
+        );
+      }
+
+      const leaf = activeLeaf();
+
+      // Solutions
+      if (leaf && leaf.solutions && leaf.solutions.length) {
+        leaf.solutions.forEach((sol, i) => {
+          const node = el("div", {
+            className: "node solution",
+            id: "node-S" + i,
+          }, [
+            el("div", { className: "kind" }, "Solución · " + sol.kind),
+            el("div", { className: "title" }, sol.title),
+          ]);
+          rankSol.appendChild(node);
+        });
+      } else {
+        rankSol.appendChild(
+          el("div", { className: "empty-hint" }, "Sin soluciones en esta hoja — o elige una sub-oportunidad.")
+        );
+      }
+
+      // Experiment
+      if (leaf && leaf.experiment) {
+        rankExp.appendChild(
+          el("div", {
+            className: "node experiment",
+            id: "node-EXP",
+          }, [
+            el("div", { className: "kind" }, "Experimento / prueba de supuestos"),
+            el("div", { className: "title" }, leaf.experiment),
+          ])
+        );
+      } else {
+        rankExp.appendChild(
+          el("div", { className: "empty-hint" }, "Sin experimento definido aún para esta hoja.")
+        );
+      }
+
+      // Detail panels
+      const whyTarget = leaf || opp;
+      document.getElementById("why-text").textContent = whyTarget ? whyTarget.why : "";
+      const pills = document.getElementById("meta-pills");
+      pills.innerHTML = "";
+      if (opp) {
+        [
+          opp.id + (leaf && leaf.id !== opp.id ? " → " + leaf.id : ""),
+          opp.pillar,
+          "Confianza " + opp.confidence.toLowerCase(),
+          opp.hypotheses ? "Hipótesis " + opp.hypotheses : null,
+          opp.ideas + " ideas",
+        ]
+          .filter(Boolean)
+          .forEach((t, i) => {
+            pills.appendChild(el("span", { className: "pill" + (i === 0 ? " hot" : "") }, t));
+          });
+      }
+      document.getElementById("meta-text").textContent = leaf && leaf.id !== opp.id
+        ? "Trabaja en la hoja (" + leaf.id + "), no en el padre. Las soluciones viven solo en hojas."
+        : opp && opp.children.length
+          ? opp.id + " no es hoja: elige una sub-oportunidad para ver soluciones."
+          : "Hoja lista para comparar soluciones (RICE + Kano en Notion).";
+
+      if (opp && opp.provisional) {
+        document.getElementById("meta-text").textContent +=
+          " Evidencia aún parcial (dato + hipótesis): validar en entrevistas antes de solución cara.";
+      }
+
+      requestAnimationFrame(drawConnectors);
+    }
+
+    function centerOf(el) {
+      const stage = document.getElementById("stage");
+      const s = stage.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      return {
+        x: r.left - s.left + r.width / 2,
+        yTop: r.top - s.top,
+        yBot: r.bottom - s.top,
+      };
+    }
+
+    function pathVertical(x1, y1, x2, y2) {
+      const mid = y1 + (y2 - y1) / 2;
+      return `M ${x1} ${y1} L ${x1} ${mid} L ${x2} ${mid} L ${x2} ${y2}`;
+    }
+
+    function drawConnectors() {
+      const svg = document.getElementById("connectors");
+      const stage = document.getElementById("stage");
+      svg.setAttribute("width", stage.scrollWidth);
+      svg.setAttribute("height", stage.scrollHeight);
+      svg.style.width = stage.scrollWidth + "px";
+      svg.style.height = stage.scrollHeight + "px";
+      svg.innerHTML = "";
+
+      const out = document.getElementById("node-OUT");
+      if (!out) return;
+      const outC = centerOf(out);
+
+      const oppNodes = opportunities.map((o) => document.getElementById("node-" + o.id)).filter(Boolean);
+
+      // horizontal bus under outcome to all opps
+      if (oppNodes.length) {
+        const tops = oppNodes.map((n) => centerOf(n));
+        const minX = Math.min(...tops.map((t) => t.x));
+        const maxX = Math.max(...tops.map((t) => t.x));
+        const busY = outC.yBot + 28;
+
+        const trunk = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        trunk.setAttribute("d", `M ${outC.x} ${outC.yBot} L ${outC.x} ${busY}`);
+        svg.appendChild(trunk);
+
+        const bus = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        bus.setAttribute("d", `M ${minX} ${busY} L ${maxX} ${busY}`);
+        svg.appendChild(bus);
+
+        tops.forEach((t, i) => {
+          const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          p.setAttribute("d", `M ${t.x} ${busY} L ${t.x} ${t.yTop}`);
+          if (opportunities[i].id !== selectedOppId) p.classList.add("dim");
+          svg.appendChild(p);
+        });
+      }
+
+      const opp = findOpp(selectedOppId);
+      const oppEl = document.getElementById("node-" + selectedOppId);
+      if (!opp || !oppEl) return;
+      const oppC = centerOf(oppEl);
+
+      if (opp.children.length) {
+        const childEls = opp.children
+          .map((c) => document.getElementById("node-" + c.id))
+          .filter(Boolean);
+        if (childEls.length) {
+          const cs = childEls.map((n) => centerOf(n));
+          const busY = oppC.yBot + 28;
+          const minX = Math.min(...cs.map((t) => t.x));
+          const maxX = Math.max(...cs.map((t) => t.x));
+
+          const trunk = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          trunk.setAttribute("d", `M ${oppC.x} ${oppC.yBot} L ${oppC.x} ${busY}`);
+          svg.appendChild(trunk);
+
+          const bus = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          bus.setAttribute("d", `M ${minX} ${busY} L ${maxX} ${busY}`);
+          svg.appendChild(bus);
+
+          cs.forEach((t, i) => {
+            const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            p.setAttribute("d", `M ${t.x} ${busY} L ${t.x} ${t.yTop}`);
+            if (opp.children[i].id !== selectedChildId) p.classList.add("dim");
+            svg.appendChild(p);
+          });
+        }
+      }
+
+      const leaf = activeLeaf();
+      const leafEl = leaf
+        ? document.getElementById("node-" + leaf.id) || oppEl
+        : null;
+      if (!leaf || !leafEl) return;
+      const leafC = centerOf(leafEl);
+
+      const solEls = Array.from(document.querySelectorAll("#rank-solutions .node.solution"));
+      if (solEls.length) {
+        const ss = solEls.map((n) => centerOf(n));
+        const busY = leafC.yBot + 28;
+        const minX = Math.min(...ss.map((t) => t.x));
+        const maxX = Math.max(...ss.map((t) => t.x));
+
+        const trunk = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        trunk.setAttribute("d", `M ${leafC.x} ${leafC.yBot} L ${leafC.x} ${busY}`);
+        svg.appendChild(trunk);
+
+        const bus = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        bus.setAttribute("d", `M ${minX} ${busY} L ${maxX} ${busY}`);
+        svg.appendChild(bus);
+
+        ss.forEach((t) => {
+          const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          p.setAttribute("d", `M ${t.x} ${busY} L ${t.x} ${t.yTop}`);
+          svg.appendChild(p);
+        });
+
+        // experiment under solutions
+        const exp = document.getElementById("node-EXP");
+        if (exp) {
+          const expC = centerOf(exp);
+          const midX = (minX + maxX) / 2;
+          const busY2 = ss[0].yBot + 28;
+          const p1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          p1.setAttribute("d", `M ${midX} ${ss[0].yBot} L ${midX} ${busY2} L ${expC.x} ${busY2} L ${expC.x} ${expC.yTop}`);
+          svg.appendChild(p1);
+        }
+      } else {
+        const exp = document.getElementById("node-EXP");
+        if (exp) {
+          const expC = centerOf(exp);
+          const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          p.setAttribute("d", pathVertical(leafC.x, leafC.yBot, expC.x, expC.yTop));
+          svg.appendChild(p);
+        }
+      }
+    }
+
+    document.getElementById("btn-discovery").addEventListener("click", () => {
+      selectedOppId = "O0";
+      selectedChildId = "O0.2";
+      render();
+      document.getElementById("node-O0")?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    });
+
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      selectedOppId = "O1";
+      selectedChildId = "O1.1";
+      render();
+      document.getElementById("node-O1")?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    });
+
+    document.getElementById("btn-print").addEventListener("click", () => window.print());
+
+    window.addEventListener("resize", () => requestAnimationFrame(drawConnectors));
+    document.getElementById("stage-wrap").addEventListener("scroll", () => requestAnimationFrame(drawConnectors));
+
+    render();
+  </script>
+</body>
+</html>
